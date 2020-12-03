@@ -1,13 +1,24 @@
 import { Body, Controller, Get, Post, Query,Request, Render,Response } from '@nestjs/common';
+import { UserEntity } from './user.entity';
+import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
+    constructor(
+        private readonly userService:UserService
+    ){}
     @Get()
     index(@Request() req:{[key:string]:any}){
         // console.log(req.signedCookies,'当前的cookie');
         console.log(req.session);
         
         return '主页'
+    }
+    @Post()
+    async createUser(
+        @Body() data:{[propName:string]:any}
+    ):Promise<UserEntity>{
+        return await this.userService.createUser(data)
     }
     //session
     @Get('login')
@@ -44,11 +55,11 @@ export class UserController {
     //     res.redirect('/user')//重定向到用户首页
     //     //如果在控制器函数中使用了@Response()就不能使用return返回值
     // }
-    userList(
+    @Get()
+    async userList(
         @Query() query:any
-    ):string{
-        console.log(query);
-        return '用户列表'
+    ):Promise<UserEntity[]>{
+        return await this.userService.userList();
         
     }
 }
